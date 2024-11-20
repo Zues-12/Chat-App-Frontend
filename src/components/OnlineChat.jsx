@@ -1,14 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addMessage,
+  getMessages,
+  receiveMessage,
+} from "../features/messages/messageSlice";
 
 export default function OnlineChat({ socket }) {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const [users, setUsers] = useState([]);
   const [activeUser, setActiveUser] = useState(null);
   const messagesContainerRef = useRef(null);
-  //   const messages = useSelector((state) => state.message.list);
-  const [messages, setMessages] = useState([]);
+  const messages = useSelector((state) => state.message.list);
   const [newMessage, setNewMessage] = useState("");
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     socket.emit("user:login", { userId: user._id, username: user.username });
@@ -28,7 +40,7 @@ export default function OnlineChat({ socket }) {
     socket.on(
       "message:receive",
       (message) => {
-        messages.push(message);
+        dispatch(receiveMessage(message));
       },
       [messages]
     );
@@ -40,7 +52,7 @@ export default function OnlineChat({ socket }) {
 
   const handleSelectUser = (user) => {
     setActiveUser(user);
-    setMessages([]);
+    dispatch(getMessages(user.userId));
   };
 
   const handleCancel = (e) => {
@@ -54,32 +66,27 @@ export default function OnlineChat({ socket }) {
       toUserId: activeUser.userId,
       content: newMessage,
     });
+    dispatch(
+      addMessage({ content: newMessage, receiver: activeUser.userId })
+    ).unwrap();
     setNewMessage("");
-
-    const message = {
-      senderId: user._Id,
-      sender: user.username,
-      content: newMessage,
-      timestamp: new Date().toISOString(),
-    };
-    messages.push(message);
   };
 
   return (
-    <div className="pt-20 pl-5 bg-slate-800 flex flex-col h-screen text-white">
+    <div className="pt-20 pl-1 bg-slate-800 min-h-screen text-white">
       <div className="text-center text-2xl underline">This is a Chat Page</div>
-      <div className="flex h-screen mt-5 pb-10">
-        <div className="w-1/3 p-4 bg-slate-700 rounded overflow-y-auto max-h-[470px]">
-          <div className="text-center m-3 underline">Onilne Users:</div>
+      <div className="flex h-screen mt-4 pb-10">
+        <div className="w-1/3 py-4 px-1 bg-slate-700 rounded overflow-y-auto">
+          <div className="text-center mt-3 underline">Onilne Users:</div>
           {users.length > 0 &&
             users.map((user) => (
               <div
                 onClick={() => handleSelectUser(user)}
-                className="bg-slate-800 p-2 rounded my-2"
+                className="bg-slate-800 text-wrap p-1 rounded my-2"
                 key={user.userId}
               >
                 {user.username}{" "}
-                <span className="text-sm text-gray-400"> {user.userId}</span>
+                <div className="text-sm text-gray-400 "> {user.userId}</div>
               </div>
             ))}
           {users.length < 1 && (
@@ -88,8 +95,7 @@ export default function OnlineChat({ socket }) {
             </div>
           )}
         </div>
-        <div className="w-2/3 mx-2 p-4 bg-slate-700 rounded">
-          <div className="text-center m-3 underline">ChatBox</div>
+        <div className="w-2/3 mx-1 p-4 bg-slate-700 rounded">
           {activeUser ? (
             <div>
               <div className="flex bg-gray-600 p-3 rounded">
@@ -103,16 +109,19 @@ export default function OnlineChat({ socket }) {
               <div className="Messages">
                 <div
                   ref={messagesContainerRef}
-                  className="rounded-lg mb-2 mt-6  overflow-y-auto max-h-[260px]"
+                  className="rounded-lg mb-2 mt-6  overflow-y-auto max-h-[340px]"
                 >
                   {messages.length > 0 ? (
                     messages.map((msg) => (
                       <div
-                        key={msg.senderId}
+                        key={msg._id}
                         className="mb-2 p-2 rounded-md bg-gray-900 whitespace-normal break-words"
                       >
                         <strong className="text-lg">
-                          {msg?.sender ? msg.sender : ""}:
+                          {msg?.sender?.username
+                            ? msg.sender?.username
+                            : user.username}
+                          :
                         </strong>{" "}
                         {msg.content}
                         <p className="text-gray-400 text-xs text-right">
@@ -122,7 +131,7 @@ export default function OnlineChat({ socket }) {
                             minute: "numeric",
                             second: "numeric",
                             hour12: true,
-                          }).format(new Date(msg.timestamp))}
+                          }).format(new Date(msg.createdAt))}
                         </p>{" "}
                       </div>
                     ))

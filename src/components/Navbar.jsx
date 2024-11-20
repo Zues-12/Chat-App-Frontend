@@ -28,14 +28,6 @@ const Navbar = () => {
               <>
                 <li>
                   <Link to="/chat" className="text-white hover:text-gray-300">
-                    Room Chat
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/onlineChat"
-                    className="text-white hover:text-gray-300"
-                  >
                     Online Chat
                   </Link>
                 </li>

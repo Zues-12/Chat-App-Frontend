@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
-export const getMessages = createAsyncThunk('message/getMessages', async (roomId, { rejectWithValue }) => {
+export const getMessages = createAsyncThunk('message/getMessages', async (receiver, { rejectWithValue }) => {
     try {
-        const response = await api.get(`/room/${roomId}`)
+        console.log(receiver)
+        const response = await api.get(`/message/${receiver}`);
+        console.log(response)
         return response.data;
-
     } catch (err) {
         console.log(err)
         return rejectWithValue({
@@ -17,10 +18,11 @@ export const getMessages = createAsyncThunk('message/getMessages', async (roomId
     }
 })
 
-export const addMessage = createAsyncThunk('message/addMessage', async ({ roomId, content }, { rejectWithValue }) => {
+export const addMessage = createAsyncThunk('message/addMessage', async ({ receiver, content }, { rejectWithValue }) => {
 
     try {
-        const response = await api.post('/message', { roomId, content })
+        const response = await api.post('/message', { receiver, content })
+        console.log(response.data)
         return response.data;
     } catch (err) {
         console.log(err)
@@ -66,7 +68,7 @@ const messageSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(addMessage.fulfilled, (state, action) => {
-                // state.list.push(action.payload)
+                state.list.push(action.payload)
                 state.error = null
                 state.status = 'idle';
             })

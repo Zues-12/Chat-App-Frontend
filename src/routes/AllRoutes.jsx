@@ -6,8 +6,6 @@ import Navbar from "../components/Navbar";
 import Login from "../components/LoginPage";
 import Signup from "../components/SignupPage";
 import ProtectedRoute from "../components/ProtectedRoute";
-import ChatPage from "../components/ChatPage";
-import AddRoom from "../components/AddRoom";
 import OnlineChat from "../components/OnlineChat";
 import io from "socket.io-client";
 
@@ -27,11 +25,11 @@ export default function AllRoutes() {
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/signup" element={<Signup />} />
           <Route element={<ProtectedRoute />}>
-            <Route exact path="/chat" element={<ChatPage socket={socket} />} />
-            <Route exact path="/addRoom" element={<AddRoom />} />
+            {/* <Route exact path="/chat" element={<ChatPage socket={socket} />} />
+            <Route exact path="/addRoom" element={<AddRoom />} /> */}
             <Route
               exact
-              path="/onlineChat"
+              path="/chat"
               element={<OnlineChat socket={socket} />}
             />
           </Route>
