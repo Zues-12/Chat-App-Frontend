@@ -5,6 +5,7 @@ import {
   getMessages,
   receiveMessage,
 } from "../features/messages/messageSlice";
+import Toast from "./Toast";
 
 export default function OnlineChat({ socket }) {
   const dispatch = useDispatch();
@@ -17,10 +18,12 @@ export default function OnlineChat({ socket }) {
 
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scroll({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
-  }, [messages]);
+  }, [messages.length]);
 
   useEffect(() => {
     socket.emit("user:login", { userId: user._id, username: user.username });
@@ -34,17 +37,13 @@ export default function OnlineChat({ socket }) {
     return () => {
       socket.off("user:list");
     };
-  }, [users, socket, user._id, user.username]);
+  }, [socket, user._id, user.username, user]);
 
   useEffect(() => {
-    socket.on(
-      "message:receive",
-      (message) => {
+    socket.on("message:receive", (message) => {
+      if (message.sender._id === activeUser.userId)
         dispatch(receiveMessage(message));
-      },
-      [messages]
-    );
-
+    });
     return () => {
       socket.off("message:receive");
     };
@@ -62,20 +61,27 @@ export default function OnlineChat({ socket }) {
 
   const handleAddMessage = (e) => {
     e.preventDefault();
-    socket.emit("message:send", {
-      toUserId: activeUser.userId,
-      content: newMessage,
-    });
-    dispatch(
-      addMessage({ content: newMessage, receiver: activeUser.userId })
-    ).unwrap();
-    setNewMessage("");
+
+    try {
+      socket.emit("message:send", {
+        toUserId: activeUser.userId,
+        content: newMessage,
+      });
+      dispatch(
+        addMessage({ content: newMessage, receiver: activeUser.userId })
+      ).unwrap();
+      setNewMessage("");
+    } catch (error) {
+      Toast.error(
+        "There was an error sending the message" + error?.details?.message
+      );
+    }
   };
 
   return (
     <div className="pt-20 pl-1 bg-slate-800 min-h-screen text-white">
       <div className="text-center text-2xl underline">This is a Chat Page</div>
-      <div className="flex h-screen mt-4 pb-10">
+      <div className="flex min-h-screen mt-4 pb-10">
         <div className="w-1/3 py-4 px-1 bg-slate-700 rounded overflow-y-auto">
           <div className="text-center mt-3 underline">Onilne Users:</div>
           {users.length > 0 &&

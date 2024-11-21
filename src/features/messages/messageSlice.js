@@ -3,12 +3,9 @@ import api from "../../utils/api";
 
 export const getMessages = createAsyncThunk('message/getMessages', async (receiver, { rejectWithValue }) => {
     try {
-        console.log(receiver)
         const response = await api.get(`/message/${receiver}`);
-        console.log(response)
         return response.data;
     } catch (err) {
-        console.log(err)
         return rejectWithValue({
             message: err?.message,
             code: err?.code,
@@ -22,7 +19,6 @@ export const addMessage = createAsyncThunk('message/addMessage', async ({ receiv
 
     try {
         const response = await api.post('/message', { receiver, content })
-        console.log(response.data)
         return response.data;
     } catch (err) {
         console.log(err)

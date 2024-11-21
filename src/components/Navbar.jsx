@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout } from "../features/auth/authSlice";
 
-const Navbar = () => {
+const Navbar = ({ socket }) => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     dispatch(logout());
+    socket.emit("user:logout");
   };
 
   return (
     <>
-      <nav className="bg-blue-900 p-4 shadow-md fixed top-0 left-0 w-full z-10 ">
+      <nav className="bg-blue-900 p-4 shadow-md fixed top-0 left-0 w-full z-10">
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/">
             <div className="text-white text-lg font-bold">ChatApp</div>
@@ -28,7 +29,12 @@ const Navbar = () => {
               <>
                 <li>
                   <Link to="/chat" className="text-white hover:text-gray-300">
-                    Online Chat
+                    User Chat
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/group" className="text-white hover:text-gray-300">
+                    Group Chat
                   </Link>
                 </li>
                 <li>
