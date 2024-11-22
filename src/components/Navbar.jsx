@@ -2,10 +2,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+
 import { logout } from "../features/auth/authSlice";
 
 const Navbar = ({ socket }) => {
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state?.auth?.user);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     dispatch(logout());
@@ -30,11 +31,6 @@ const Navbar = ({ socket }) => {
                 <li>
                   <Link to="/chat" className="text-white hover:text-gray-300">
                     User Chat
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/group" className="text-white hover:text-gray-300">
-                    Group Chat
                   </Link>
                 </li>
                 <li>

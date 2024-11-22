@@ -5,6 +5,8 @@ const api = axios.create({
     withCredentials: true
 })
 
+// Axios API interceptor to return a rejected promise with a 401 status code **/
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {

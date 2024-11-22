@@ -8,8 +8,8 @@ import Signup from "../components/SignupPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import OnlineChat from "../components/OnlineChat";
 import io from "socket.io-client";
-import GroupChat from "../components/GroupChat";
 
+// Connects to the socket at the backend
 const socket = io("http://localhost:5000/", {
   transports: ["websocket"],
   withCredentials: true,
@@ -26,11 +26,6 @@ export default function AllRoutes() {
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/signup" element={<Signup />} />
           <Route element={<ProtectedRoute />}>
-            <Route
-              exact
-              path="/group"
-              element={<GroupChat socket={socket} />}
-            />
             <Route
               exact
               path="/chat"

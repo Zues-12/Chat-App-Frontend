@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const user = useSelector((state) => state.auth.user);
-  const authCheckLoading = useSelector((state) => state.auth.authCheckLoading);
+  const user = useSelector((state) => state.auth?.user);
+  const authCheckLoading = useSelector((state) => state.auth?.authCheckLoading);
 
   if (authCheckLoading) {
     return <div className="bg-[#323639] pt-10 min-h-screen ">Loading...</div>;
