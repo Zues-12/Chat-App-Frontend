@@ -183,9 +183,29 @@ export default function OnlineChat({ socket }) {
                           {msg.sender?.username || user.username}:
                         </strong>{" "}
                         {msg.content}
-                        <p className="text-gray-400 text-xs text-right">
+                        <div className="text-gray-400 text-xs text-right">
                           {msg.formattedTime}
-                        </p>
+
+                          {user?._id === msg.sender?._id ? (
+                            <span
+                              className={`text-${
+                                msg.isRead ? "green-500" : ""
+                              } text-lg`}
+                            >
+                              &#9751;
+                            </span>
+                          ) : (
+                            user?._id === msg.sender && (
+                              <span
+                                className={`text-${
+                                  msg.isRead ? "green-500" : ""
+                                } text-lg`}
+                              >
+                                &#9751;
+                              </span>
+                            )
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (
